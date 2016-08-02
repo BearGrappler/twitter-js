@@ -2,6 +2,7 @@ var express = require( 'express');
 var swig = require( 'swig' );
 var app = express(); //create an instance of an express application
 var path = require( 'path' );
+var routes = require('./routes/');
 
 //logging via morgan
 
@@ -9,23 +10,31 @@ var morgan = require('morgan');
 
 app.use('/', morgan('dev'));
 
-app.get('/', function(req, res){
-  res.render('index', {title: 'Hall of Fame', people: people});
+// app.get('/', function(req, res){
+//   res.render('index', {title: 'Hall of Fame', people: people});
 
-})
+// })
 
 app.get('/news', function(req, res){
     res.send('breaking news!')
 })
 
+app.use(express.static('public'));
 
+app.get('/css', function(req, res){
+    console.log(path.join(__dirname, '/public/stylesheets/style.css'));
+    res.sendFile(path.join(__dirname, '/public/stylesheets/style.css'));
+})
 //using swig to render
+
+app.use('/', routes);
+
 
 console.log(app.get('views'));
 // This is where all the magic happens!
 app.engine('html', swig.renderFile);
 app.set('view engine', 'html');
-app.set('views', __dirname + '/views');
+// app.set('views', __dirname + '/views');
 
 
 swig.setDefaults({ cache: false});
@@ -36,8 +45,7 @@ var people = [
       { name:'Son'}
     ];
 
-//path join because concatenation didn'twork
-swig.renderFile(path.join(__dirname, '/views/index.html'), people,function (err, output) { console.log(output);});
+
 
 
 //Logging via Router
