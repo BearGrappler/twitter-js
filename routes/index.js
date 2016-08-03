@@ -2,9 +2,12 @@ var express = require('express');
 var router = express.Router();
 // could use one line instead: var router = require('express').Router();
 var tweetBank = require('../tweetBank');
-var bodyParser = require('body-parser')
 
-router.get('/', function (req, res) {
+
+module.exports = function(io)
+{
+  console.log("In the router function");
+  router.get('/', function (req, res) {
   var tweets = tweetBank.list();
   showForm = true;
   res.render( 'index', { tweets: tweets, showForm: true} );
@@ -25,13 +28,16 @@ router.get( '/tweets/:id', function (req, res) {
   res.render('index', {tweets: list});
 });
 
-router.post('/tweets', function(req, res) {
-  res.send(req)
-  // var name = req.body.name;
-  // var text = req.body.text;
-  // res.send(name, text);
-  // tweetBank.add(name, text);
-  // res.redirect('/');
-});
 
-module.exports = router;
+
+//want to be able to create tweets below
+
+router.post('/tweets', function(req, res) {
+  console.log(req.body);
+  var name = req.body.name;
+  var text = req.body.text;
+  tweetBank.add(name, text);
+  res.redirect('/');
+});
+  return router;
+}

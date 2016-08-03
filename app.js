@@ -3,6 +3,12 @@ var swig = require( 'swig' );
 var app = express(); //create an instance of an express application
 var path = require( 'path' );
 var routes = require('./routes/');
+var bodyParser = require('body-parser');
+var jsonParser = bodyParser.json();
+var urlencodedParser = bodyParser.urlencoded({ extended: false});
+var socketio = require('socket.io');
+var server = app.listen(3000);
+var io = socketio.listen(server);
 
 //logging via morgan
 
@@ -10,27 +16,30 @@ var morgan = require('morgan');
 
 app.use('/', morgan('dev'));
 
+app.use(jsonParser);
+app.use(urlencodedParser);
+
 // app.get('/', function(req, res){
 //   res.render('index', {title: 'Hall of Fame', people: people});
 
 // })
 
-app.get('/news', function(req, res){
-    res.send('breaking news!')
-})
+// app.get('/news', function(req, res){
+//     res.send('breaking news!')
+// })
 
 app.use(express.static('public'));
 
 app.get('/css', function(req, res){
-    console.log(path.join(__dirname, '/public/stylesheets/style.css'));
+    // console.log(path.join(__dirname, '/public/stylesheets/style.css'));
     res.sendFile(path.join(__dirname, '/public/stylesheets/style.css'));
 })
 //using swig to render
 
-app.use('/', routes);
+app.use('/', routes(io));
 
 
-console.log(app.get('views'));
+// console.log(app.get('views'));
 // This is where all the magic happens!
 app.engine('html', swig.renderFile);
 app.set('view engine', 'html');
@@ -39,11 +48,11 @@ app.set('view engine', 'html');
 
 swig.setDefaults({ cache: false});
 
-var people = [
-      { name:'Full'},
-      { name: 'Stack'},
-      { name:'Son'}
-    ];
+// var people = [
+//       { name:'Full'},
+//       { name: 'Stack'},
+//       { name:'Son'}
+//     ];
 
 
 
@@ -71,7 +80,7 @@ var people = [
 // app.use('/', router);
 
 
-app.listen( 3000, function(){
-  console.log("Server is listening");
-})
+// app.listen( 3000, function(){
+//   console.log("Server is listening");
+// })
 
